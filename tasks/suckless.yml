@@ -1,0 +1,25 @@
+- name: suckless .. software that sucks less  
+  include_vars: "vars/suckless-tools.yml"
+  tags: suckless
+
+
+- name: Cloning suckless tools
+  git:
+    repo: "{{ item.repo }}"
+    dest: "/home/{{ user_name }}/.config/suckless/{{ item.name }}"
+  become_user: "{{ user_name }}"
+  with_items: "{{ suckless_tools }}"
+  loop: "{{ suckless_tools }}"
+  tags: suckless
+
+
+- name: Building and installing suckless tools 
+  shell: |
+    cd /home/{{ user_name }}/.config/suckless/{{ item.name }}
+    sudo make clean install
+  args:
+    executable: /bin/bash
+  become: yes
+  become_user: "{{ user_name }}"
+  loop: "{{ suckless_tools }}"
+  tags: suckless

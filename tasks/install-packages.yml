@@ -1,0 +1,50 @@
+- name: Reading package lists from files 
+  command: cat "{{ item }}"
+  register: package_contents
+  with_items:
+    - "packages/core"
+    - "packages/dev"
+    - "packages/gaming"
+    - "packages/tp"
+  tags: packages
+
+
+- name: Debugging package contents
+  debug:
+    var: package_contents
+  tags: packages
+
+
+- name: Setting package list variables
+  set_fact:
+    all_packages: >-
+      {{
+        package_contents.results
+        | map(attribute='stdout_lines')
+        | flatten
+        | select('match', '^[^\s]+$')
+        | list
+      }}
+  tags: packages
+
+
+- name: Debugging all packages
+  debug:
+    msg: "{{ all_packages }}"
+  tags: packages
+
+
+- name: Verifying package list is not empty
+  fail:
+    msg: "Package list is empty!"
+  when: all_packages | length == 0
+  tags: packages
+
+
+- name: Installing packages
+  pacman:
+    name: "{{ item }}"
+    state: present
+  loop: "{{ all_packages }}"
+  become: true
+  tags: packages

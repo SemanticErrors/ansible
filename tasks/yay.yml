@@ -1,0 +1,23 @@
+- name: Cloning yay repo
+  git:
+    repo: https://aur.archlinux.org/yay.git
+    dest: "/home/{{ user_name }}/yay"
+    force: yes
+  become_user: "{{ user_name }}"
+  tags: yay
+
+
+- name: Building and installing yay 
+  shell: |
+    cd "/home/{{ user_name }}/yay"
+    makepkg -si --noconfirm
+  become_user: "{{ user_name }}"
+  become: true
+  tags: yay
+
+- name: Cleaning up yay build files 
+  file:
+    path: "/home/{{ user_name }}/yay"
+    state: absent
+  become: true
+  tags: yay

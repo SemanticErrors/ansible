@@ -1,0 +1,24 @@
+- name: Downloading and installing nvm 
+  shell: curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
+  args:
+    creates: "/home//{{ user_name }}/.nvm/nvm.sh"
+  become_user: "{{ user_name }}"
+  tags: node
+
+# - name: configuring nvm in .bashrc
+#   lineinfile:
+#     path: "/home/{{ user_name }}/.bashrc"
+#     line: 'export NVM_DIR="$HOME/.nvm" && [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"'
+#     state: present
+#   become_user: "{{ user_name }}"
+#   tags: node
+
+- name: Loading nvm and installing Node.js LTS  
+  shell: |
+    export NVM_DIR="$HOME/.nvm"
+    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+    nvm install --lts
+  environment:
+    NVM_DIR: "/home/{{ user_name }}/.nvm"
+  become_user: "{{ user_name }}"
+  tags: node

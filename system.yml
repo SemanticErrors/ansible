@@ -1,0 +1,21 @@
+- hosts: localhost
+  become: yes
+
+  vars:
+    user_name: user_name
+
+  pre_tasks:
+  - name: Updating and Upgrading pacman packages...
+    pacman:
+      update_cache: yes
+      upgrade: yes
+    tags:
+    - yay
+    - packages
+    - suckless
+
+  tasks:
+    # - include_tasks: tasks/yay.yml
+    - include_tasks: tasks/install-packages.yml
+    # - include_tasks: tasks/suckless.yml
+    # - include_tasks: tasks/node.yml

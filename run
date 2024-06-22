@@ -1,0 +1,41 @@
+#!/bin/bash
+
+ESSENTIALS=("curl" "git" "ansible")
+
+install_if_not_installed() {
+  if ! pacman -Qi "$1" > /dev/null; then
+    echo "Installing $1..."
+    sudo pacman -Sy --noconfirm "$1"
+  else
+    echo "$1 is already installed"
+  fi
+}
+
+echo "Installing essential packages..."
+for pkg in "${ESSENTIALS[@]}"; do
+  install_if_not_installed "$pkg"
+done
+echo
+
+echo "Decrypting Packages Files..."
+ansible-vault decrypt packages/*
+
+while true; do
+    echo -n "Enter the main user: "
+    read user
+
+    if id "$user" &>/dev/null; then
+        echo "User '$user' exists."
+        break 
+    else
+        echo "User '$user' does not exist. Please try again."
+    fi
+done
+
+echo "Running Ansible playbook..."
+
+ansible-playbook system.yml -e "user_name=${user}"
+
+
+echo "Encrypting Packages Files..."
+ansible-vault encrypt packages/*
