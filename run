@@ -2,6 +2,15 @@
 
 ESSENTIALS=("curl" "git" "ansible")
 
+VAULT_FILES=(
+    "packages/core"
+    "packages/yay"
+    "packages/dev"
+    "packages/tp"
+    "packages/gaming"
+    "tasks/suckless-configuration.yml"
+)
+
 install_if_not_installed() {
   if ! pacman -Qi "$1" > /dev/null; then
     echo "Installing $1..."
@@ -11,14 +20,50 @@ install_if_not_installed() {
   fi
 }
 
+prompt_for_password() {
+    echo -n "Enter Ansible vault password: "
+    read -s VAULT_PASS
+    echo
+}
+
+decrypt_files() {
+    for VAULT_FILE in "${VAULT_FILES[@]}"
+    do
+        echo "Decrypting $VAULT_FILE ..."
+        echo "$VAULT_PASS" | ansible-vault decrypt --vault-password-file /dev/stdin "$VAULT_FILE"
+        if [ $? -eq 0 ]; then
+            echo "Decryption of $VAULT_FILE complete."
+        else
+            echo "Failed to decrypt $VAULT_FILE."
+            exit 1
+        fi
+    done
+}
+
+encrypt_files() {
+    for VAULT_FILE in "${VAULT_FILES[@]}"
+    do
+        echo "Encrypting $VAULT_FILE ..."
+        echo "$VAULT_PASS" | ansible-vault encrypt --vault-password-file /dev/stdin "$VAULT_FILE"
+        if [ $? -eq 0 ]; then
+            echo "Encryption of $VAULT_FILE complete."
+        else
+            echo "Failed to encrypt $VAULT_FILE."
+            exit 1
+        fi
+    done
+}
+
+
 echo "Installing essential packages..."
 for pkg in "${ESSENTIALS[@]}"; do
   install_if_not_installed "$pkg"
 done
 echo
 
-echo "Decrypting Packages Files..."
-ansible-vault decrypt packages/*
+prompt_for_password
+decrypt_files
+
 
 while true; do
     echo -n "Enter the main user: "
@@ -38,4 +83,6 @@ ansible-playbook system.yml -e "user_name=${user}"
 
 
 echo "Encrypting Packages Files..."
-ansible-vault encrypt packages/*
+
+encrypt_files
+unset VAULT_PASS

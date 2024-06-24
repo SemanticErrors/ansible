@@ -13,9 +13,11 @@
     - yay
     - packages
     - suckless
+    - suckless-configuration
 
   tasks:
-    # - include_tasks: tasks/yay.yml
+    - include_tasks: tasks/yay.yml
     - include_tasks: tasks/install-packages.yml
-    # - include_tasks: tasks/suckless.yml
-    # - include_tasks: tasks/node.yml
+    - include_tasks: tasks/suckless.yml
+    - include_tasks: tasks/suckless-configuration.yml
+    - include_tasks: tasks/node.yml
