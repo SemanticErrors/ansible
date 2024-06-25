@@ -20,4 +20,5 @@
     - include_tasks: tasks/install-packages.yml
     - include_tasks: tasks/suckless.yml
     - include_tasks: tasks/suckless-configuration.yml
+    - include_tasks: tasks/managing-dotfiles.yml
     - include_tasks: tasks/node.yml
