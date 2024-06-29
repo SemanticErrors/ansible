@@ -10,6 +10,7 @@ VAULT_FILES=(
     "packages/gaming"
     "tasks/suckless-configuration.yml"
     "tasks/managing-dotfiles.yml"
+    "tasks/scripts.yml"
 )
 
 install_if_not_installed() {
